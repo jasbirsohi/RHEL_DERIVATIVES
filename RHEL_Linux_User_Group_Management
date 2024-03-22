@@ -1,0 +1,48 @@
+
+# Document Started MARCH 22, 2024
+# Version 0.1
+
+sudo groupadd -g <custom_gid> <group_name>
+sudo groupadd -g 500 13infotech01
+
+sudo useradd -u <custom_uid> -g <group_name> <username>
+sudo useradd -u 500 -g 13infotech01 13infotech01
+
+Set Password for the User 
+sudo passwd 13infotech01
+
+13infotech01:x:500:500::/home/13infotech01:/bin/bash
+
+sudo groupadd -g 501 13infotech
+sudo useradd -u 501 -g 13infotech 13infotech
+
+13infotech01:x:500:500::/home/13infotech01:/bin/bash
+13infotech:x:501:501::/home/13infotech:/bin/bash
+
+13infotech01 is not in the sudoers file.  This incident will be reported.
+
+sudo groupadd -g 502 nextgenasiademos1
+sudo useradd -u 502 -g nextgenasiademos1 nextgenasiademos1
+passwd nextgenasiademos1
+
+
+
+
+# To add a user to the sudoers file, follow these steps
+# Open the sudoers file using the visudo command:
+sudo visudo
+# Scroll down to the section that defines user privileges
+# Add a new line to grant sudo access to the user
+13infotech01   ALL=(ALL) ALL
+13infotech01   ALL=(ALL) ALL
+nextgenasiademos1   ALL=(ALL) ALL
+
+
+# Alternative Way
+
+# Create a Sudo User on CentOS
+# A sudo user is a super user in Linux. There are several ways to accomplish this task, but simplest is to add the user to the wheel group.
+
+# In the following example, the new user student1 is added to the wheel group, giving him sudo rights.
+
+sudo useradd -G wheel -c "Student1 is an admin" student1

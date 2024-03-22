@@ -1,0 +1,210 @@
+# Document Started MARCH 22, 2024
+# Version 0.1
+# Source -  https://www.rosehosting.com/blog/how-to-set-up-private-dns-servers-with-bind-on-centos-8/
+
+# How to Set Up Private DNS Servers with BIND on RHEL 8.x Deravatives
+
+
+
+
+
+
+
+options {
+     // listen-on port 53 { 127.0.0.1; };
+     // listen-on-v6 port 53 { ::1; };
+        allow-query     { localhost;172.16.146.0/24; };
+//Forward Zone
+zone "13infotech.local" IN {
+
+           type master;
+           file "13infotech.local.db";
+           allow-update { none; };
+
+};
+
+//Reverse Zone
+zone "146.16.172.in-addr.arpa" IN {
+
+             type master;
+             file "172.16.146.db";
+             allow-update { none; };
+
+};
+
+
+
+
+
+vi /var/named/13infotech.local.db
+
+
+$TTL 86400
+@   IN  SOA     ns1.13infotech.local. root.13infotech.local. (
+                                              3           ;Serial
+                                              3600        ;Refresh
+                                              1800        ;Retry
+                                              604800      ;Expire
+                                              86400       ;Minimum TTL
+)
+
+;Name Server Information
+@       IN  NS      ns1.13infotech.local.
+
+;IP address of Name Server
+ns1       IN  A       172.16.146.139
+
+;A - Record HostName To Ip Address
+www     IN  A       172.16.146.140
+app1    IN  A       172.16.146.141
+
+;CNAME record
+ftp     IN CNAME        www.13infotech.local.
+
+
+
+
+
+
+vi /var/named/172.16.146.db
+
+$TTL 86400
+@   IN  SOA     ns1.13infotech.local. root.13infotech.local. (
+                                       3           ;Serial
+                                       3600        ;Refresh
+                                       1800        ;Retry
+                                       604800      ;Expire
+                                       86400       ;Minimum TTL
+)
+
+;Name Server Information
+@         IN      NS         ns1.13infotech.local.
+
+;Reverse lookup for Name Server
+139       IN  PTR     ns1.13infotech.local.
+
+;PTR Record IP address to HostName
+140      IN  PTR     www.13infotech.local.
+141      IN  PTR     app1.13infotech.local.
+
+
+
+systemctl start named
+systemctl enable named
+
+# After configuring all zone files, you will need to verify the configuration files.
+# First, validate the main configuration file with the following command:
+
+named-checkconf /etc/named.conf
+
+# If everything is fine, you won’t see any errors
+
+# Next, verify the forward zone file with the following command:
+
+named-checkzone 13infotech.local /var/named/13infotech.local.db
+
+[root@console801 ~]# named-checkzone 13infotech.local /var/named/13infotech.local.db
+zone 13infotech.local/IN: loaded serial 3
+OK
+
+# Next, verify the reverse zone file with the following command
+named-checkzone 146.16.172.in-addr.arpa /var/named/172.16.146.db
+
+[root@console801 ~]# named-checkzone 146.16.172.in-addr.arpa /var/named/172.16.146.db
+zone 146.16.172.in-addr.arpa/IN: loaded serial 3
+OK
+
+# Finally, restart the BIND service to apply the changes
+systemctl restart named
+
+# Configure Firewall
+
+# Next, you will need to create a firewall rule for port 53 to allow DNS queries from client machines. You can create it with the following command
+firewall-cmd --permanent --add-port=53/udp
+[root@console801 ~]# firewall-cmd --permanent --add-port=53/udp
+success
+# Next, reload the firewall service to apply the changes
+firewall-cmd --reload
+[root@console801 ~]# firewall-cmd --reload
+success
+# At this point, the BIND DNS server is installed and configured. It’s time to check whether it is working or not
+# First, edit your /etc/resolv.conf file and add your DNS server IP
+vi /etc/resolv.conf
+# Add the following line at the beginning of the file
+nameserver 172.16.146.139
+
+# Save and close the file then verify the forward lookup using the dig command:
+
+
+dig www.13infotech.local
+dig ns1.13infotech.local
+
+# verify the reverse lookup with the following command
+dig -x 172.16.146.139
+
+
+
+# To prevent NetworkManager from overriding changes to the /etc/resolv.conf file in Red Hat 8, you can follow these steps
+sudo vi /etc/NetworkManager/conf.d/custom-dns.conf
+
+# Add Configuration: Inside the file, add the following configuration to instruct NetworkManager to not manage the /etc/resolv.conf file
+
+[main]
+dns=none
+
+# Save and Exit: Save the changes to the file and exit the text editor
+# Restart NetworkManager: Restart the NetworkManager service to apply the changes
+
+sudo systemctl restart NetworkManager
+
+# Now, NetworkManager should no longer overwrite changes made to the /etc/resolv.conf file
+
+#################################################################################
+
+# To Install Dig DNS utility
+dnf install bind-utils
+
+# The procedure to do a reverse DNS Lookup in Linux and Unix
+# Open the terminal application
+Type dig -x ip_address command to do rDNS
+
+# Another command to check Reverse DNS is to type host ip_address command.
+# MS-Windows user type the nslookup ip_address_here to check and print reverse DNS (rDNS)
+
+
+################################################################################
+
+# How to change DNS settings on RHEL using Network Manager
+# https://www.cyberciti.biz/faq/change-dns-ip-address-rhel-redhat-linux/
+
+ vi /etc/sysconfig/network-scripts/ifcfg-ovirtmgmt
+
+# Simply run the following nmcli command to get a list of connection names
+sudo nmcli connection
+
+
+# Example
+sudo nmcli con mod {connectionNameHere} ipv4.dns "192.168.2.254 192.168.2.18"
+# So the command will be 
+sudo nmcli con mod ovirtmgmt ipv4.dns "192.168.100.249 8.8.8.8"
+# Reload new DNS settings by running any one of the following command
+sudo systemctl restart NetworkManager.service
+
+
+# OR
+sudo nmcli connection reload
+
+# Verify it by using the grep command and cat command and host command
+cat /etc/resolv.conf
+
+
+grep DNS /etc/sysconfig/network-scripts/ifcfg-ovirtmgmt
+# Example Output
+grep DNS /etc/sysconfig/network-scripts/ifcfg-ovirtmgmt
+DNS1=192.168.100.249
+DNS2=8.8.8.8
+IPV4_DNS_PRIORITY=40
+IPV6_PEERDNS=no
+
+
+host www.cyberciti.biz

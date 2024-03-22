@@ -1,0 +1,13 @@
+# Document Started MARCH 22, 2024
+# Version 0.1
+# This command first installs the EPEL (Extra Packages for Enterprise Linux) repository, which contains additional packages not included in the default Oracle Linux repositories. Then, it installs htop from the EPEL repository.
+
+# To install htop on Oracle Linux 8, follow these step-by-step commands
+# Update Package Lists
+sudo dnf update
+# Install EPEL Repository
+sudo dnf install epel-release
+# This command first installs the EPEL (Extra Packages for Enterprise Linux) repository, which contains additional packages not included in the default Oracle Linux repositories. Then, it installs htop from the EPEL repository.
+
+# Install htop
+sudo dnf install htop
