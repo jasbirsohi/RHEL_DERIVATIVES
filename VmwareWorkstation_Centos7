@@ -1,0 +1,61 @@
+# Document Started on 03/26/2024
+# Version 0.1
+
+# Step-by-Step Installation Commands of VMware Workstation 12 on CentOS 7
+
+# Download VMware Workstation 12:
+# Visit the VMware website and download VMware Workstation 12 for Linux.
+# Install Required Dependencies:
+# Ensure your CentOS 7 system is up to date
+sudo yum update
+
+# Install development tools and kernel headers
+sudo yum install gcc kernel-devel
+
+# Make the Installer Executable & save it user home directory
+
+# Make the installer executable
+chmod +x VMware-Workstation-Full-12.x.x-xxxxxxx.x86_64.bundle
+
+# Run the Installer:
+# Execute the installer with root privileges
+sudo ./VMware-Workstation-Full-12.x.x-xxxxxxx.x86_64.bundle
+
+
+# Follow the Installation Wizard:
+# The installer will guide you through the installation process.
+# Accept the license agreement.
+
+# Start VMware Workstation
+# Launch VMware Workstation from the applications menu or terminal
+# Verify Installation
+# Open VMware Workstation and ensure it starts without errors.
+
+# Remember to replace 12.x.x-xxxxxxx with the specific version you downloaded
+
+# Sample Output
+
+[tabasco@centos701 ~]$ ls
+Desktop    Downloads  Pictures  Templates  VMware-Workstation-Full-12.5.9-7535481.x86_64.bundle
+Documents  Music      Public    Videos
+[tabasco@centos701 ~]$ chmod +x VMware-Workstation-Full-12.5.9-7535481.x86_64.bundle 
+[tabasco@centos701 ~]$ sudo yum install gcc kernel-devel
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: download.nus.edu.sg
+ * extras: download.nus.edu.sg
+ * updates: download.nus.edu.sg
+Package gcc-4.8.5-44.el7.x86_64 already installed and latest version
+Package kernel-devel-3.10.0-1160.114.2.el7.x86_64 already installed and latest version
+Nothing to do
+[tabasco@centos701 ~]$ sudo ./VMware-Workstation-Full-12.5.9-7535481.x86_64.bundle 
+Extracting VMware Installer...done.
+
+(vmware-installer.py:3533): Gtk-WARNING **: Unable to locate theme engine in module_path: "adwaita",
+/usr/share/themes/Adwaita/gtk-2.0/main.rc:730: error: unexpected identifier `direction', expected character `}'
+
+(vmware-installer.py:3533): Gtk-WARNING **: Unable to locate theme engine in module_path: "adwaita",
+/usr/share/themes/Adwaita/gtk-2.0/hacks.rc:28: error: invalid string constant "normal_entry", expected valid string constant
+Gtk-Message: Failed to load module "pk-gtk-module": libpk-gtk-module.so: cannot open shared object file: No such file or directory
+Gtk-Message: Failed to load module "canberra-gtk-module": libcanberra-gtk-module.so: cannot open shared object file: No such file or directory
+[tabasco@centos701 ~]$ 
